@@ -2,9 +2,19 @@ from fastapi import FastAPI
 from app.config.database import engine, Base
 from sqlalchemy import text
 
+from fastapi.middleware.cors import CORSMiddleware
+
 from app.routes.query_routes import router as query_router
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all (for development)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.get("/")
