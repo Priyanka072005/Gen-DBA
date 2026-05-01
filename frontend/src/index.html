@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Gen-DBA Dashboard</title>
+</head>
+<body>
+
+<h2>Gen-DBA Query Analyzer</h2>
+
+<input type="number" id="queryId" placeholder="Enter Query ID">
+<button onclick="analyzeQuery()">Analyze</button>
+
+<h3>Result:</h3>
+<div id="output"></div>
+
+<script>
+async function analyzeQuery() {
+    const id = document.getElementById("queryId").value;
+
+    const response = await fetch(`http://127.0.0.1:8000/analyze/${id}`);
+    const data = await response.json();
+
+    document.getElementById("output").innerHTML = `
+        <p><b>Query:</b> ${data.query}</p>
+        <p><b>Execution Time:</b> ${data.execution_time}</p>
+        <p><b>Issues:</b> ${data.issues}</p>
+        <p><b>Suggestion:</b> ${data.suggestion}</p>
+        <p><b>Priority:</b> ${data.priority}</p>
+    `;
+}
+</script>
+
+</body>
+</html>
