@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, Text, Float, String, TIMESTAMP
-from app.config.database import Base
+from backend.app.config.database import engine, Base
 from sqlalchemy import Column, Integer, Float, String, Text
 
 class QueryLog(Base):

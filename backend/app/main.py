@@ -1,16 +1,16 @@
 from fastapi import FastAPI
-from app.config.database import engine, Base
 from sqlalchemy import text
-
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routes.query_routes import router as query_router
+from backend.app.config.database import engine, Base
+from backend.app.routes.query_routes import router as query_router
 
 app = FastAPI()
 
+# CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # allow all (for development)
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -22,7 +22,7 @@ def home():
     return {"message": "Gen-DBA is running"}
 
 
-# 🔥 DB TEST ROUTE
+# DB Test
 @app.get("/test-db")
 def test_db():
     try:
@@ -40,7 +40,7 @@ def test_db():
 app.include_router(query_router)
 
 
-# 🔥 CREATE TABLES (ONLY FOR DEVELOPMENT)
+# Create tables
 @app.on_event("startup")
 def create_tables():
     Base.metadata.create_all(bind=engine)

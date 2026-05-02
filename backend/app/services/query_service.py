@@ -1,5 +1,5 @@
 from sqlalchemy import text
-from app.models.query_model import QueryLog, ExecutionPlan
+from backend.app.models.query_model import QueryLog, ExecutionPlan   
 
 
 def create_query(db, query_data):
@@ -18,7 +18,7 @@ def create_query(db, query_data):
 
 import time
 from sqlalchemy import text
-from app.models.query_model import QueryLog, ExecutionPlan
+from backend.app.models.query_model import QueryLog, ExecutionPlan
 
 
 def analyze_query(db, query_id):

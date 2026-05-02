@@ -1,13 +1,24 @@
-# Virtual Environment
-envo/
-
-# Environment Variables
-.env
-
-# Python cache
+# Python
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
 
-# OS junk
+# Virtual Environment
+venv/
+env/
+backend/venv/
+envo/
+
+# Environment variables
+.env
+
+# VS Code
+.vscode/
+
+# OS files
 .DS_Store
 Thumbs.db
+
+# Logs
+*.log
