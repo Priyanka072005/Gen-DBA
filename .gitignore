@@ -9,6 +9,7 @@ venv/
 env/
 backend/venv/
 envo/
+myenvo/
 
 # Environment variables
 .env
