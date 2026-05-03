@@ -2,8 +2,8 @@ from fastapi import FastAPI
 from sqlalchemy import text
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.app.config.database import engine, Base
-from backend.app.routes.query_routes import router as query_router
+from app.config.database import engine, Base
+from app.routes.query_routes import router as query_router
 
 app = FastAPI()
 

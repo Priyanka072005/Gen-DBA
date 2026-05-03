@@ -1,5 +1,6 @@
 from sqlalchemy import text
-from backend.app.models.query_model import QueryLog, ExecutionPlan   
+from app.models.query_model import QueryLog, ExecutionPlan
+import time
 
 
 def create_query(db, query_data):
@@ -8,17 +9,12 @@ def create_query(db, query_data):
         database_name=query_data.database_name,
         user_name=query_data.user_name
     )
-    
+
     db.add(new_query)
     db.commit()
     db.refresh(new_query)
 
     return new_query
-
-
-import time
-from sqlalchemy import text
-from backend.app.models.query_model import QueryLog, ExecutionPlan
 
 
 def analyze_query(db, query_id):
@@ -28,6 +24,9 @@ def analyze_query(db, query_id):
         return {"error": "Query not found"}
 
     try:
+        # 🔥 SWITCH TO TARGET DATABASE
+        db.execute(text(f"USE {query.database_name}"))
+
         # 🔥 Measure execution time
         start_time = time.time()
         db.execute(text(query.query_text)).fetchall()
@@ -35,11 +34,11 @@ def analyze_query(db, query_id):
 
         execution_time = end_time - start_time
 
-        # Save in DB
+        # Save execution time
         query.execution_time = execution_time
         db.commit()
 
-        # 🔥 EXPLAIN
+        # 🔥 EXPLAIN QUERY
         explain_query = f"EXPLAIN {query.query_text}"
         result = db.execute(text(explain_query)).fetchall()
 
@@ -51,6 +50,7 @@ def analyze_query(db, query_id):
             row_dict = dict(row._mapping)
             plan_data.append(row_dict)
 
+            # 🔥 Issue Detection
             if row_dict.get("type") == "ALL":
                 issues.append("Full Table Scan detected")
                 suggestion = "Create index on column used in WHERE condition"
@@ -59,6 +59,7 @@ def analyze_query(db, query_id):
                 issues.append("High rows scanned")
                 suggestion = "Optimize query or add indexing"
 
+            # Save execution plan
             new_plan = ExecutionPlan(
                 query_id=query_id,
                 cost=row_dict.get("rows"),
@@ -70,20 +71,22 @@ def analyze_query(db, query_id):
 
         db.commit()
 
-        # 🔥 Impact scoring
-        rows_scanned = plan_data[0].get("rows", 0)
+        # 🔥 SAFE handling if no plan data
+        rows_scanned = plan_data[0].get("rows", 0) if plan_data else 0
         frequency = query.frequency if query.frequency else 1
 
-        impact_score = (execution_time * 0.5) + (rows_scanned * 0.3) + (frequency * 0.2)
+        # 🔥 Impact Score (improved weight)
+        impact_score = (execution_time * 10) + (rows_scanned * 0.05) + (frequency * 2)
 
-        if impact_score > 50:
+        # 🔥 Priority Logic (better thresholds)
+        if impact_score > 100:
             priority = "HIGH"
-        elif impact_score > 20:
+        elif impact_score > 30:
             priority = "MEDIUM"
         else:
             priority = "LOW"
 
-        # 🔥 FINAL RESPONSE
+        # ✅ FINAL RESPONSE (ALWAYS SAFE FOR FRONTEND)
         return {
             "query": query.query_text,
             "execution_time": execution_time,
@@ -94,6 +97,14 @@ def analyze_query(db, query_id):
             "priority": priority
         }
 
-
     except Exception as e:
-        return {"error": str(e)}
+        # 🔥 IMPORTANT: frontend crash avoid
+        return {
+            "query": query.query_text,
+            "execution_time": 0,
+            "execution_plan": [],
+            "issues": ["Error occurred"],
+            "suggestion": str(e),
+            "impact_score": 0,
+            "priority": "LOW"
+        }

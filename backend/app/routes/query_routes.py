@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
-from backend.app.config.database import get_db
-from backend.app.schemas.query_schema import QueryCreate
-from backend.app.services.query_service import create_query, analyze_query
-from backend.app.models.query_model import QueryLog
+from app.config.database import get_db
+from app.schemas.query_schema import QueryCreate
+from app.services.query_service import create_query, analyze_query
+from app.models.query_model import QueryLog
 
 
 router = APIRouter()
