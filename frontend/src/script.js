@@ -1,55 +1,70 @@
 async function analyzeQuery() {
     const id = document.getElementById("queryId").value;
-    const output = document.getElementById("output");
+    const loader = document.getElementById("loader");
 
-    if (!id) {
-        output.innerHTML = `<p class="error">Please enter a Query ID</p>`;
-        return;
-    }
+    if (!id) return;
+
+    loader.classList.remove("hidden");
 
     try {
-        const response = await fetch(`http://127.0.0.1:8000/analyze/${id}`);
+        const res = await fetch(`http://127.0.0.1:8000/analyze/${id}`);
+        const data = await res.json();
 
-        if (!response.ok) {
-            throw new Error("API request failed");
-        }
+        const execTime = Number(data.execution_time || 0).toFixed(3);
+        const priority = (data.priority || "LOW").toUpperCase();
 
-        const data = await response.json();
+        // Execution Time
+        document.getElementById("execTime").innerText = execTime + " sec";
 
-        // 🔥 Handle backend error
-        if (data.error) {
-            output.innerHTML = `<p class="error">Error: ${data.error}</p>`;
-            return;
-        }
+        // Priority
+        document.getElementById("priority").innerText = priority;
 
-        // 🔥 Safe execution time
-        const execTime = data.execution_time 
-            ? Number(data.execution_time).toFixed(5) 
-            : "0.00000";
+        // 🔥 CLEAN ISSUES LIST (NO DUPLICATE)
+        const issuesList = document.getElementById("issues");
+        issuesList.innerHTML = "";
 
-        // 🔥 SAFE priority handling (MAIN FIX)
-        const priority = (data.priority || "LOW").toLowerCase();
+        const uniqueIssues = [...new Set(data.issues || [])];
 
-        let priorityClass = "priority-low";
-        if (priority === "high") priorityClass = "priority-high";
-        else if (priority === "medium") priorityClass = "priority-medium";
+        uniqueIssues.forEach(issue => {
+            const li = document.createElement("li");
+            li.innerText = issue;
+            issuesList.appendChild(li);
+        });
 
-        // 🔥 Safe issues display
-        const issues = Array.isArray(data.issues) 
-            ? data.issues.join(", ") 
-            : (data.issues || "No issues");
+        // 🔥 METER (MEANING)
+        updateMeter(priority);
 
-        output.innerHTML = `
-            <p><span class="label">Query:</span> ${data.query || "N/A"}</p>
-            <p><span class="label">Execution Time:</span> ${execTime} sec</p>
-            <p><span class="label">Issues:</span> ${issues}</p>
-            <p><span class="label">Suggestion:</span> ${data.suggestion || "N/A"}</p>
-            <p><span class="label">Priority:</span> 
-                <span class="${priorityClass}">${data.priority || "LOW"}</span>
-            </p>
+        // 🔥 SUGGESTION (VISIBLE)
+        document.getElementById("output").innerHTML = `
+            <h3>💡 Optimization Suggestion</h3>
+            <p>${data.suggestion}</p>
         `;
 
     } catch (error) {
-        output.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        document.getElementById("output").innerHTML =
+            `<p class="error">Error: ${error.message}</p>`;
     }
+
+    loader.classList.add("hidden");
+}
+
+
+// 🔥 SMART METER
+function updateMeter(priority) {
+    const meter = document.getElementById("meter");
+
+    let text = "";
+
+    if (priority === "HIGH") {
+        text = "🔴 SLOW QUERY\nOptimization Required";
+    } 
+    else if (priority === "MEDIUM") {
+        text = "🟡 MODERATE QUERY\nCan be Improved";
+    } 
+    else {
+        text = "🟢 FAST QUERY\nOptimized";
+    }
+
+    meter.innerText = text;
+    meter.className = "meter " + priority.toLowerCase();
 }

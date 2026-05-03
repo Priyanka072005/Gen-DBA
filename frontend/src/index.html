@@ -8,12 +8,57 @@
 <body>
 
 <div class="container">
-    <h2>Gen-DBA Query Analyzer</h2>
 
-    <input type="number" id="queryId" placeholder="Enter Query ID">
-    <button onclick="analyzeQuery()">Analyze</button>
+    <h1>🚀 Gen-DBA Dashboard</h1>
 
-    <div class="result" id="output"></div>
+    <!-- 🔥 Input -->
+    <div class="input-section">
+        <input type="number" id="queryId" placeholder="Enter Query ID">
+        <button onclick="analyzeQuery()">Analyze</button>
+    </div>
+
+    <!-- 🔥 Loader -->
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+        <p>Analyzing Query...</p>
+    </div>
+
+    <!-- 🔥 Cards -->
+    <div class="cards">
+        <div class="card">
+            <h3>⏱ Execution Time</h3>
+            <p id="execTime">--</p>
+        </div>
+
+        <div class="card">
+            <h3>📊 Priority</h3>
+            <p id="priority">--</p>
+        </div>
+    </div>
+
+    <!-- 🔥 Issues + Suggestion (SIDE BY SIDE) -->
+    <div class="middle-section">
+
+        <!-- Issues -->
+        <div class="issues-box">
+            <h3>⚠ Issues Detected</h3>
+            <ul id="issues"></ul>
+        </div>
+
+        <!-- Suggestion -->
+        <div class="suggestion-box" id="output">
+            <h3>💡 Optimization Suggestion</h3>
+            <p>Result will appear here...</p>
+        </div>
+
+    </div>
+
+    <!-- 🔥 Performance Meter -->
+    <div class="meter-box">
+        <h3>⚡ Performance Status</h3>
+        <div id="meter" class="meter">--</div>
+    </div>
+
 </div>
 
 <script src="script.js"></script>
