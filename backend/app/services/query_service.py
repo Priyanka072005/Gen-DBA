@@ -2,6 +2,9 @@ from sqlalchemy import text
 from app.models.query_model import QueryLog, ExecutionPlan
 import time
 
+# 🔥 ML IMPORT
+from app.ml.predictor import predict_priority
+
 
 def create_query(db, query_data):
     new_query = QueryLog(
@@ -24,10 +27,10 @@ def analyze_query(db, query_id):
         return {"error": "Query not found"}
 
     try:
-        # 🔥 SWITCH TO TARGET DATABASE
+        # 🔥 SWITCH DATABASE
         db.execute(text(f"USE {query.database_name}"))
 
-        # 🔥 Measure execution time
+        # 🔥 EXECUTION TIME
         start_time = time.time()
         db.execute(text(query.query_text)).fetchall()
         end_time = time.time()
@@ -38,26 +41,26 @@ def analyze_query(db, query_id):
         query.execution_time = execution_time
         db.commit()
 
-        # 🔥 EXPLAIN QUERY
+        # 🔥 EXPLAIN
         explain_query = f"EXPLAIN {query.query_text}"
         result = db.execute(text(explain_query)).fetchall()
 
         issues = []
         plan_data = []
-        suggestion = "Query is optimized"
 
         for row in result:
             row_dict = dict(row._mapping)
             plan_data.append(row_dict)
 
-            # 🔥 Issue Detection
+            # 🔥 Issue detection
             if row_dict.get("type") == "ALL":
                 issues.append("Full Table Scan detected")
-                suggestion = "Create index on column used in WHERE condition"
 
             if row_dict.get("rows") and row_dict.get("rows") > 100:
                 issues.append("High rows scanned")
-                suggestion = "Optimize query or add indexing"
+
+            if "JOIN" in query.query_text.upper() and row_dict.get("rows", 0) > 500:
+                issues.append("Inefficient JOIN detected")
 
             # Save execution plan
             new_plan = ExecutionPlan(
@@ -71,40 +74,43 @@ def analyze_query(db, query_id):
 
         db.commit()
 
-        # 🔥 SAFE handling if no plan data
+        # 🔥 FEATURES FOR ML
         rows_scanned = plan_data[0].get("rows", 0) if plan_data else 0
-        frequency = query.frequency if query.frequency else 1
+        has_join = 1 if "JOIN" in query.query_text.upper() else 0
 
-        # 🔥 Impact Score (improved weight)
-        impact_score = (execution_time * 10) + (rows_scanned * 0.05) + (frequency * 2)
+        # 🤖 ML PREDICTION
+        priority = predict_priority(
+            execution_time,
+            rows_scanned,
+            has_join
+        )
 
-        # 🔥 Priority Logic (better thresholds)
-        if impact_score > 100:
-            priority = "HIGH"
-        elif impact_score > 30:
-            priority = "MEDIUM"
+        # 🔥 ML-BASED SUGGESTION
+        if priority == "HIGH":
+            suggestion = "Query is expensive. Use indexing, avoid full scan, optimize joins"
+
+        elif priority == "MEDIUM":
+            suggestion = "Query can be optimized using filters or indexing"
+
         else:
-            priority = "LOW"
+            suggestion = "Query is efficient"
 
-        # ✅ FINAL RESPONSE (ALWAYS SAFE FOR FRONTEND)
+        # 🔥 FINAL RESPONSE
         return {
             "query": query.query_text,
             "execution_time": execution_time,
             "execution_plan": plan_data,
             "issues": issues if issues else ["No major issues"],
             "suggestion": suggestion,
-            "impact_score": impact_score,
             "priority": priority
         }
 
     except Exception as e:
-        # 🔥 IMPORTANT: frontend crash avoid
         return {
             "query": query.query_text,
             "execution_time": 0,
             "execution_plan": [],
             "issues": ["Error occurred"],
             "suggestion": str(e),
-            "impact_score": 0,
             "priority": "LOW"
         }
