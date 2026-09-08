@@ -1,12 +1,36 @@
-import pickle
 import os
+import pickle
 
-model_path = os.path.join(os.path.dirname(__file__), "model.pkl")
+BASE_DIR = os.path.dirname(__file__)
+MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
 
-with open(model_path, "rb") as f:
-    model = pickle.load(f)
+with open(MODEL_PATH, "rb") as file:
+    model = pickle.load(file)
 
 
 def predict_priority(execution_time, rows_scanned, has_join):
-    prediction = model.predict([[execution_time, rows_scanned, has_join]])
+    """
+    Predict query priority.
+
+    Parameters
+    ----------
+    execution_time : float
+    rows_scanned : int
+    has_join : int
+        0 = No JOIN
+        1 = JOIN Present
+
+    Returns
+    -------
+    LOW / MEDIUM / HIGH
+    """
+
+    features = [[
+        float(execution_time),
+        int(rows_scanned),
+        int(has_join)
+    ]]
+
+    prediction = model.predict(features)
+
     return prediction[0]

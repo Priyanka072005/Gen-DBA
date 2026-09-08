@@ -2,7 +2,7 @@ from sqlalchemy import text
 from app.models.query_model import QueryLog, ExecutionPlan
 import time
 
-# 🔥 ML IMPORT
+#  ML IMPORT
 from app.ml.predictor import predict_priority
 
 
@@ -27,10 +27,10 @@ def analyze_query(db, query_id):
         return {"error": "Query not found"}
 
     try:
-        # 🔥 SWITCH DATABASE
+        #  SWITCH DATABASE
         db.execute(text(f"USE {query.database_name}"))
 
-        # 🔥 EXECUTION TIME
+        #  EXECUTION TIME
         start_time = time.time()
         db.execute(text(query.query_text)).fetchall()
         end_time = time.time()
@@ -41,7 +41,7 @@ def analyze_query(db, query_id):
         query.execution_time = execution_time
         db.commit()
 
-        # 🔥 EXPLAIN
+        #  EXPLAIN
         explain_query = f"EXPLAIN {query.query_text}"
         result = db.execute(text(explain_query)).fetchall()
 
@@ -57,7 +57,7 @@ def analyze_query(db, query_id):
                 issues.append("Full Table Scan detected")
 
             if row_dict.get("rows") and row_dict.get("rows") > 100:
-                issues.append("High rows scanned")
+                issues = list(set(issues))
 
             if "JOIN" in query.query_text.upper() and row_dict.get("rows", 0) > 500:
                 issues.append("Inefficient JOIN detected")
@@ -74,8 +74,11 @@ def analyze_query(db, query_id):
 
         db.commit()
 
-        # 🔥 FEATURES FOR ML
-        rows_scanned = plan_data[0].get("rows", 0) if plan_data else 0
+        #  FEATURES FOR ML
+        rows_scanned = sum(
+            row.get("rows", 0) or 0
+            for row in plan_data
+        )
         has_join = 1 if "JOIN" in query.query_text.upper() else 0
 
         # 🤖 ML PREDICTION
@@ -85,7 +88,7 @@ def analyze_query(db, query_id):
             has_join
         )
 
-        # 🔥 ML-BASED SUGGESTION
+        #  ML-BASED SUGGESTION
         if priority == "HIGH":
             suggestion = "Query is expensive. Use indexing, avoid full scan, optimize joins"
 
@@ -95,7 +98,7 @@ def analyze_query(db, query_id):
         else:
             suggestion = "Query is efficient"
 
-        # 🔥 FINAL RESPONSE
+        #  FINAL RESPONSE
         return {
             "query": query.query_text,
             "execution_time": execution_time,

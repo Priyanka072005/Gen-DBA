@@ -1,25 +1,79 @@
-import pandas as pd
-from sklearn.tree import DecisionTreeClassifier
+import os
 import pickle
+import pandas as pd
 
-# Sample training data (you can expand later)
-data = {
-    "execution_time": [0.1, 0.5, 1.2, 2.5, 0.05, 3.0],
-    "rows_scanned": [10, 200, 5000, 20000, 5, 50000],
-    "has_join": [0, 0, 1, 1, 0, 1],
-    "priority": ["LOW", "MEDIUM", "HIGH", "HIGH", "LOW", "HIGH"]
-}
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, classification_report
 
-df = pd.DataFrame(data)
+# ----------------------------------
+# Load Dataset
+# ----------------------------------
+
+BASE_DIR = os.path.dirname(__file__)
+DATASET_PATH = os.path.join(BASE_DIR, "training_data.csv")
+
+df = pd.read_csv(DATASET_PATH)
+
+print("\nDataset Loaded Successfully")
+print(df.head())
+
+# ----------------------------------
+# Features & Target
+# ----------------------------------
 
 X = df[["execution_time", "rows_scanned", "has_join"]]
 y = df["priority"]
 
-model = DecisionTreeClassifier()
-model.fit(X, y)
+# ----------------------------------
+# Train-Test Split
+# ----------------------------------
 
-# Save model
-with open("app/ml/model.pkl", "wb") as f:
+X_train, X_test, y_train, y_test = train_test_split(
+    X,
+    y,
+    test_size=0.20,
+    random_state=42,
+    stratify=y
+)
+
+# ----------------------------------
+# Create Model
+# ----------------------------------
+
+model = DecisionTreeClassifier(
+    criterion="entropy",
+    max_depth=6,
+    min_samples_split=5,
+    min_samples_leaf=2,
+    random_state=42
+)
+
+# ----------------------------------
+# Train
+# ----------------------------------
+
+model.fit(X_train, y_train)
+
+# ----------------------------------
+# Test Accuracy
+# ----------------------------------
+
+predictions = model.predict(X_test)
+
+print("\nAccuracy :", accuracy_score(y_test, predictions))
+
+print("\nClassification Report\n")
+print(classification_report(y_test, predictions))
+
+# ----------------------------------
+# Save Model
+# ----------------------------------
+
+MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
+
+with open(MODEL_PATH, "wb") as f:
     pickle.dump(model, f)
 
-print("Model trained and saved!")
+print("\nModel Saved Successfully")
+print(MODEL_PATH)
