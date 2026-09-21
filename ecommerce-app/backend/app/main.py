@@ -1,31 +1,32 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.database import engine
-from app.routes.products import router as products_router
+from app.routes import products
 
-app = FastAPI(title="E-commerce Application")
+app = FastAPI(
+    title="GenShop API",
+    description="E-commerce backend for GenShop",
+    version="1.0.0"
+)
+
+# Allow React frontend to communicate with FastAPI
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Product routes
+app.include_router(products.router)
 
 
 @app.get("/")
-def home():
+def root():
     return {
-        "message": "E-commerce API is running"
+        "message": "GenShop API is running"
     }
-
-
-@app.get("/db-test")
-def db_test():
-    try:
-        with engine.connect():
-            return {
-                "status": "success",
-                "message": "Database connected successfully"
-            }
-    except Exception as e:
-        return {
-            "status": "error",
-            "message": str(e)
-        }
-
-
-app.include_router(products_router)
