@@ -1,10 +1,13 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 function Products() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
@@ -33,75 +36,150 @@ function Products() {
   return (
     <div className="products-page">
 
-      {/* PAGE HEADER */}
-      <section className="products-header">
-        <div>
-          <span className="section-label">OUR COLLECTION</span>
+      {/* =========================
+          PAGE HEADER
+      ========================= */}
 
-          <h1>Explore Products</h1>
+      <section className="products-header">
+
+        <div className="products-header-content">
+
+          {/* BACK TO HOME */}
+          <button
+            type="button"
+            className="back-home-button"
+            onClick={() => navigate("/")}
+          >
+            <span className="back-arrow">←</span>
+            <span>Back to Home</span>
+          </button>
+
+          <span className="section-label">
+            OUR COLLECTION
+          </span>
+
+          <h1>
+            Explore Products
+          </h1>
 
           <p>
             Discover products from our extensive collection.
           </p>
+
         </div>
+
+        {/* PRODUCT COUNT */}
 
         <div className="product-count">
-          <strong>{filteredProducts.length}</strong>
-          <span>Products</span>
+          <strong>
+            {filteredProducts.length}
+          </strong>
+
+          <span>
+            Products
+          </span>
         </div>
+
       </section>
 
-      {/* SEARCH / FILTER BAR */}
+      {/* =========================
+          SEARCH / FILTER BAR
+      ========================= */}
+
       <section className="products-toolbar">
 
         <div className="search-box">
-          <span>🔍</span>
+
+          <span>
+            🔍
+          </span>
 
           <input
             type="text"
             placeholder="Search by category..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
+
         </div>
 
-        <button className="filter-button">
+        <button
+          type="button"
+          className="filter-button"
+        >
           ⚙ Filters
         </button>
 
       </section>
 
-      {/* PRODUCTS */}
+      {/* =========================
+          PRODUCTS
+      ========================= */}
+
       <section className="products-container">
 
         {loading ? (
+
+          /* LOADING */
+
           <div className="loading">
+
             <div className="loader"></div>
-            <p>Loading products...</p>
+
+            <p>
+              Loading products...
+            </p>
+
           </div>
+
         ) : filteredProducts.length === 0 ? (
+
+          /* NO PRODUCTS */
+
           <div className="no-products">
-            <div>🔍</div>
-            <h2>No products found</h2>
-            <p>Try searching for another category.</p>
+
+            <div>
+              🔍
+            </div>
+
+            <h2>
+              No products found
+            </h2>
+
+            <p>
+              Try searching for another category.
+            </p>
+
           </div>
+
         ) : (
+
+          /* PRODUCT GRID */
+
           <div className="real-product-grid">
 
             {filteredProducts.map((product) => (
+
               <div
                 className="real-product-card"
                 key={product.product_id}
               >
 
-                {/* PRODUCT IMAGE PLACEHOLDER */}
+                {/* PRODUCT IMAGE */}
+
                 <div className="real-product-image">
 
                   <span className="product-badge">
                     NEW
                   </span>
 
-                  <button className="product-heart">
+                  <button
+                    type="button"
+                    className="product-heart"
+                    aria-label="Add to wishlist"
+                  >
                     ♡
                   </button>
 
@@ -111,15 +189,23 @@ function Products() {
 
                 </div>
 
-                {/* PRODUCT DETAILS */}
+                {/* PRODUCT INFORMATION */}
+
                 <div className="real-product-info">
 
+                  {/* CATEGORY */}
+
                   <span className="real-product-category">
+
                     {product.product_category_name ||
                       "General"}
+
                   </span>
 
+                  {/* PRODUCT NAME */}
+
                   <h3>
+
                     {product.product_category_name
                       ? product.product_category_name
                           .replace(/_/g, " ")
@@ -127,34 +213,45 @@ function Products() {
                             letter.toUpperCase()
                           )
                       : "Product"}
+
                   </h3>
 
-                  <div className="real-rating">
-                    ⭐⭐⭐⭐⭐
-                    <span>4.5</span>
+                  {/* PRODUCT ID */}
+
+                  <div className="product-meta">
+
+                    <span>
+                      Product ID
+                    </span>
+
+                    <span>
+                      {product.product_id.slice(0, 8)}...
+                    </span>
+
                   </div>
 
-                  <div className="real-product-bottom">
+                  {/* PRODUCT DETAILS */}
 
-                    <strong>
-                      ₹{(
-                        299 +
-                        (product.product_weight_g || 0) % 2000
-                      ).toLocaleString("en-IN")}
-                    </strong>
+                  <div className="product-details">
 
-                    <button className="small-cart">
-                      🛒
-                    </button>
+                    <span>
+                      📦 {product.product_weight_g || 0}g
+                    </span>
+
+                    <span>
+                      📷 {product.product_photos_qty || 0}
+                    </span>
 
                   </div>
 
                 </div>
 
               </div>
+
             ))}
 
           </div>
+
         )}
 
       </section>
