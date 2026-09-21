@@ -1,5 +1,8 @@
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 import Products from "./pages/Products";
+import ProductDetails from "./pages/ProductDetails";
+import Orders from "./pages/Orders";
+import OrderDetails from "./pages/OrderDetails";
 import "./App.css";
 
 function Home() {
@@ -75,6 +78,7 @@ function Home() {
 
         <Link to="/" className="logo">
           <span className="logo-icon">G</span>
+
           <span>
             Gen<span>Shop</span>
           </span>
@@ -84,7 +88,7 @@ function Home() {
           <Link to="/">Home</Link>
           <Link to="/products">Products</Link>
           <a href="#categories">Categories</a>
-          <a href="#orders">Orders</a>
+          <Link to="/orders">Orders</Link>
         </nav>
 
         <div className="nav-actions">
@@ -109,6 +113,7 @@ function Home() {
           </button>
 
         </div>
+
       </header>
 
       {/* HERO */}
@@ -202,15 +207,19 @@ function Home() {
           <div className="section-header">
 
             <div>
+
               <span className="section-label">
                 EXPLORE
               </span>
 
-              <h2>Shop by Category</h2>
+              <h2>
+                Shop by Category
+              </h2>
 
               <p>
                 Find everything you need in one place.
               </p>
+
             </div>
 
             <Link
@@ -225,6 +234,7 @@ function Home() {
           <div className="category-grid">
 
             {categories.map((category) => (
+
               <div
                 className="category-card"
                 key={category.title}
@@ -235,8 +245,15 @@ function Home() {
                 </div>
 
                 <div>
-                  <h3>{category.title}</h3>
-                  <p>{category.text}</p>
+
+                  <h3>
+                    {category.title}
+                  </h3>
+
+                  <p>
+                    {category.text}
+                  </p>
+
                 </div>
 
                 <span className="arrow">
@@ -244,6 +261,7 @@ function Home() {
                 </span>
 
               </div>
+
             ))}
 
           </div>
@@ -256,15 +274,19 @@ function Home() {
           <div className="section-header">
 
             <div>
+
               <span className="section-label">
                 TRENDING NOW
               </span>
 
-              <h2>Featured Products</h2>
+              <h2>
+                Featured Products
+              </h2>
 
               <p>
                 Popular products picked for you.
               </p>
+
             </div>
 
             <Link
@@ -279,6 +301,7 @@ function Home() {
           <div className="product-grid">
 
             {products.map((product) => (
+
               <div
                 className="product-card"
                 key={product.name}
@@ -306,7 +329,9 @@ function Home() {
                     {product.category}
                   </span>
 
-                  <h3>{product.name}</h3>
+                  <h3>
+                    {product.name}
+                  </h3>
 
                   <div className="rating">
                     ⭐⭐⭐⭐⭐
@@ -314,8 +339,15 @@ function Home() {
                   </div>
 
                   <div className="price-row">
-                    <strong>{product.price}</strong>
-                    <del>{product.oldPrice}</del>
+
+                    <strong>
+                      {product.price}
+                    </strong>
+
+                    <del>
+                      {product.oldPrice}
+                    </del>
+
                   </div>
 
                   <button className="add-cart">
@@ -325,6 +357,7 @@ function Home() {
                 </div>
 
               </div>
+
             ))}
 
           </div>
@@ -372,12 +405,19 @@ function Home() {
 
           <div className="footer-brand">
 
-            <Link to="/" className="logo">
-              <span className="logo-icon">G</span>
+            <Link
+              to="/"
+              className="logo"
+            >
+
+              <span className="logo-icon">
+                G
+              </span>
 
               <span>
                 Gen<span>Shop</span>
               </span>
+
             </Link>
 
             <p>
@@ -389,34 +429,73 @@ function Home() {
 
           <div className="footer-column">
 
-            <h4>Shop</h4>
+            <h4>
+              Shop
+            </h4>
 
-            <Link to="/products">All Products</Link>
-            <Link to="/products">Categories</Link>
-            <Link to="/products">Deals</Link>
-            <Link to="/products">New Arrivals</Link>
+            <Link to="/products">
+              All Products
+            </Link>
+
+            <Link to="/products">
+              Categories
+            </Link>
+
+            <Link to="/products">
+              Deals
+            </Link>
+
+            <Link to="/products">
+              New Arrivals
+            </Link>
 
           </div>
 
           <div className="footer-column">
 
-            <h4>Support</h4>
+            <h4>
+              Support
+            </h4>
 
-            <a href="/">Contact Us</a>
-            <a href="/">Help Center</a>
-            <a href="/">Shipping</a>
-            <a href="/">Returns</a>
+            <a href="/">
+              Contact Us
+            </a>
+
+            <a href="/">
+              Help Center
+            </a>
+
+            <a href="/">
+              Shipping
+            </a>
+
+            <a href="/">
+              Returns
+            </a>
 
           </div>
 
           <div className="footer-column">
 
-            <h4>Company</h4>
+            <h4>
+              Company
+            </h4>
 
-            <a href="/">About Us</a>
-            <a href="/">Privacy Policy</a>
-            <a href="/">Terms</a>
-            <a href="/">Careers</a>
+            <a href="/">
+              About Us
+            </a>
+
+            <a href="/">
+              Privacy Policy
+            </a>
+
+            <a href="/">
+              Terms
+            </a>
+
+            <a href="/">
+              Careers
+            </a>
 
           </div>
 
@@ -443,16 +522,37 @@ function Home() {
 function App() {
   return (
     <BrowserRouter>
+
       <Routes>
 
-        <Route path="/" element={<Home />} />
+        {/* HOME */}
+        <Route
+          path="/"
+          element={<Home />}
+        />
 
+        {/* PRODUCTS */}
         <Route
           path="/products"
           element={<Products />}
         />
 
+        {/* PRODUCT DETAILS */}
+        <Route
+          path="/products/:productId"
+          element={<ProductDetails />}
+        />
+
+        <Route
+          path="/orders"
+          element={<Orders />}
+        />
+
+        <Route
+         path="/orders/:orderId" element={<OrderDetails />} />
+
       </Routes>
+
     </BrowserRouter>
   );
 }

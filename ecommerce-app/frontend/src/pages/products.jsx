@@ -87,6 +87,7 @@ function Products() {
         </div>
 
         <div className="product-count">
+
           <strong>
             {filteredProducts.length}
           </strong>
@@ -94,6 +95,7 @@ function Products() {
           <span>
             Products
           </span>
+
         </div>
 
       </section>
@@ -137,6 +139,7 @@ function Products() {
                 )}
             </option>
           ))}
+
         </select>
 
       </section>
@@ -181,6 +184,11 @@ function Products() {
               <div
                 className="real-product-card"
                 key={product.product_id}
+                onClick={() =>
+                  navigate(
+                    `/products/${product.product_id}`
+                  )
+                }
               >
 
                 <div className="real-product-image">
@@ -192,6 +200,9 @@ function Products() {
                   <button
                     type="button"
                     className="product-heart"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
                   >
                     ♡
                   </button>

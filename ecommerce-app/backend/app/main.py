@@ -2,6 +2,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes import products
+from app.routes import orders
+
 
 app = FastAPI(
     title="GenShop API",
@@ -9,7 +11,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Allow React frontend to communicate with FastAPI
+
+# ---------------------------------------------------------
+# CORS
+# ---------------------------------------------------------
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -21,9 +27,18 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Product routes
-app.include_router(products.router)
 
+# ---------------------------------------------------------
+# ROUTES
+# ---------------------------------------------------------
+
+app.include_router(products.router)
+app.include_router(orders.router)
+
+
+# ---------------------------------------------------------
+# ROOT
+# ---------------------------------------------------------
 
 @app.get("/")
 def root():
