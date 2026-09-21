@@ -4,13 +4,16 @@ import { useNavigate } from "react-router-dom";
 
 function Products() {
   const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
+    fetchCategories();
   }, []);
 
   const fetchProducts = async () => {
@@ -27,24 +30,39 @@ function Products() {
     }
   };
 
-  const filteredProducts = products.filter((product) =>
-    (product.product_category_name || "")
-      .toLowerCase()
-      .includes(search.toLowerCase())
-  );
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8001/products/categories"
+      );
+
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  const filteredProducts = products.filter((product) => {
+    const matchesSearch =
+      (product.product_category_name || "")
+        .toLowerCase()
+        .includes(search.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "All" ||
+      product.product_category_name === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="products-page">
 
-      {/* =========================
-          PAGE HEADER
-      ========================= */}
-
+      {/* PAGE HEADER */}
       <section className="products-header">
 
         <div className="products-header-content">
 
-          {/* BACK TO HOME */}
           <button
             type="button"
             className="back-home-button"
@@ -68,8 +86,6 @@ function Products() {
 
         </div>
 
-        {/* PRODUCT COUNT */}
-
         <div className="product-count">
           <strong>
             {filteredProducts.length}
@@ -82,47 +98,53 @@ function Products() {
 
       </section>
 
-      {/* =========================
-          SEARCH / FILTER BAR
-      ========================= */}
-
+      {/* SEARCH + FILTER */}
       <section className="products-toolbar">
 
         <div className="search-box">
 
-          <span>
-            🔍
-          </span>
+          <span>🔍</span>
 
           <input
             type="text"
             placeholder="Search by category..."
             value={search}
-            onChange={(e) =>
-              setSearch(e.target.value)
-            }
+            onChange={(e) => setSearch(e.target.value)}
           />
 
         </div>
 
-        <button
-          type="button"
-          className="filter-button"
+        <select
+          className="category-select"
+          value={selectedCategory}
+          onChange={(e) =>
+            setSelectedCategory(e.target.value)
+          }
         >
-          ⚙ Filters
-        </button>
+          <option value="All">
+            All Categories
+          </option>
+
+          {categories.map((category) => (
+            <option
+              key={category}
+              value={category}
+            >
+              {category
+                .replace(/_/g, " ")
+                .replace(/\b\w/g, (letter) =>
+                  letter.toUpperCase()
+                )}
+            </option>
+          ))}
+        </select>
 
       </section>
 
-      {/* =========================
-          PRODUCTS
-      ========================= */}
-
+      {/* PRODUCTS */}
       <section className="products-container">
 
         {loading ? (
-
-          /* LOADING */
 
           <div className="loading">
 
@@ -136,27 +158,21 @@ function Products() {
 
         ) : filteredProducts.length === 0 ? (
 
-          /* NO PRODUCTS */
-
           <div className="no-products">
 
-            <div>
-              🔍
-            </div>
+            <div>🔍</div>
 
             <h2>
               No products found
             </h2>
 
             <p>
-              Try searching for another category.
+              Try another category or search.
             </p>
 
           </div>
 
         ) : (
-
-          /* PRODUCT GRID */
 
           <div className="real-product-grid">
 
@@ -167,8 +183,6 @@ function Products() {
                 key={product.product_id}
               >
 
-                {/* PRODUCT IMAGE */}
-
                 <div className="real-product-image">
 
                   <span className="product-badge">
@@ -178,7 +192,6 @@ function Products() {
                   <button
                     type="button"
                     className="product-heart"
-                    aria-label="Add to wishlist"
                   >
                     ♡
                   </button>
@@ -189,23 +202,14 @@ function Products() {
 
                 </div>
 
-                {/* PRODUCT INFORMATION */}
-
                 <div className="real-product-info">
 
-                  {/* CATEGORY */}
-
                   <span className="real-product-category">
-
                     {product.product_category_name ||
                       "General"}
-
                   </span>
 
-                  {/* PRODUCT NAME */}
-
                   <h3>
-
                     {product.product_category_name
                       ? product.product_category_name
                           .replace(/_/g, " ")
@@ -213,10 +217,7 @@ function Products() {
                             letter.toUpperCase()
                           )
                       : "Product"}
-
                   </h3>
-
-                  {/* PRODUCT ID */}
 
                   <div className="product-meta">
 
@@ -229,8 +230,6 @@ function Products() {
                     </span>
 
                   </div>
-
-                  {/* PRODUCT DETAILS */}
 
                   <div className="product-details">
 

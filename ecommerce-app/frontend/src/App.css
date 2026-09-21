@@ -1435,3 +1435,39 @@ a {
   font-size: 16px;
   line-height: 1;
 }
+
+.category-select {
+  min-width: 190px;
+
+  padding: 0 14px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+
+  background: white;
+
+  color: #374151;
+
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 600;
+
+  outline: none;
+
+  cursor: pointer;
+}
+
+.category-select:focus {
+  border-color: #6366f1;
+}
+
+@media (max-width: 600px) {
+  .products-toolbar {
+    flex-direction: column;
+  }
+
+  .category-select {
+    height: 42px;
+    width: 100%;
+  }
+}
