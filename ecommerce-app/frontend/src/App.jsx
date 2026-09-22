@@ -3,6 +3,7 @@ import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
+import Customers from "./pages/Customers";
 import "./App.css";
 
 function Home() {
@@ -87,6 +88,7 @@ function Home() {
         <nav className="nav-links">
           <Link to="/">Home</Link>
           <Link to="/products">Products</Link>
+          <Link to="/customers">Customers</Link>
           <a href="#categories">Categories</a>
           <Link to="/orders">Orders</Link>
         </nav>
@@ -543,13 +545,23 @@ function App() {
           element={<ProductDetails />}
         />
 
+        {/* ORDERS */}
         <Route
           path="/orders"
           element={<Orders />}
         />
 
+        {/* ORDER DETAILS */}
         <Route
-         path="/orders/:orderId" element={<OrderDetails />} />
+          path="/orders/:orderId"
+          element={<OrderDetails />}
+        />
+
+        {/* CUSTOMERS */}
+        <Route
+          path="/customers"
+          element={<Customers />}
+        />
 
       </Routes>
 
