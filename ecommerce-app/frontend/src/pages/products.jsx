@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Products() {
   const [products, setProducts] = useState([]);
@@ -10,16 +10,23 @@ function Products() {
   const [selectedCategory, setSelectedCategory] = useState("All");
 
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   useEffect(() => {
+    const categoryFromHome = searchParams.get("category");
+
+    if (categoryFromHome) {
+      setSelectedCategory(categoryFromHome);
+    }
+
     fetchProducts();
     fetchCategories();
-  }, []);
+  }, [searchParams]);
 
   const fetchProducts = async () => {
     try {
       const response = await axios.get(
-        "http://127.0.0.1:8001/products/?skip=0&limit=40"
+        "http://127.0.0.1:8001/products/?skip=0&limit=100"
       );
 
       setProducts(response.data);
@@ -42,15 +49,26 @@ function Products() {
     }
   };
 
+  const formatCategory = (category) => {
+    if (!category) {
+      return "General";
+    }
+
+    return category
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
   const filteredProducts = products.filter((product) => {
-    const matchesSearch =
-      (product.product_category_name || "")
-        .toLowerCase()
-        .includes(search.toLowerCase());
+    const categoryName = product.product_category_name || "";
+
+    const matchesSearch = categoryName
+      .toLowerCase()
+      .includes(search.toLowerCase());
 
     const matchesCategory =
       selectedCategory === "All" ||
-      product.product_category_name === selectedCategory;
+      categoryName === selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
@@ -76,12 +94,10 @@ function Products() {
             OUR COLLECTION
           </span>
 
-          <h1>
-            Explore Products
-          </h1>
+          <h1>Explore Products</h1>
 
           <p>
-            Discover products from our extensive collection.
+            Discover products from our real business database.
           </p>
 
         </div>
@@ -100,7 +116,7 @@ function Products() {
 
       </section>
 
-      {/* SEARCH + FILTER */}
+      {/* SEARCH + CATEGORY FILTER */}
       <section className="products-toolbar">
 
         <div className="search-box">
@@ -111,7 +127,9 @@ function Products() {
             type="text"
             placeholder="Search by category..."
             value={search}
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={(e) =>
+              setSearch(e.target.value)
+            }
           />
 
         </div>
@@ -123,21 +141,20 @@ function Products() {
             setSelectedCategory(e.target.value)
           }
         >
+
           <option value="All">
             All Categories
           </option>
 
           {categories.map((category) => (
+
             <option
               key={category}
               value={category}
             >
-              {category
-                .replace(/_/g, " ")
-                .replace(/\b\w/g, (letter) =>
-                  letter.toUpperCase()
-                )}
+              {formatCategory(category)}
             </option>
+
           ))}
 
         </select>
@@ -194,7 +211,7 @@ function Products() {
                 <div className="real-product-image">
 
                   <span className="product-badge">
-                    NEW
+                    PRODUCT
                   </span>
 
                   <button
@@ -216,18 +233,15 @@ function Products() {
                 <div className="real-product-info">
 
                   <span className="real-product-category">
-                    {product.product_category_name ||
-                      "General"}
+                    {formatCategory(
+                      product.product_category_name
+                    )}
                   </span>
 
                   <h3>
-                    {product.product_category_name
-                      ? product.product_category_name
-                          .replace(/_/g, " ")
-                          .replace(/\b\w/g, (letter) =>
-                            letter.toUpperCase()
-                          )
-                      : "Product"}
+                    {formatCategory(
+                      product.product_category_name
+                    )}
                   </h3>
 
                   <div className="product-meta">

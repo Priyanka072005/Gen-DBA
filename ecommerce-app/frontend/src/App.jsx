@@ -1,5 +1,11 @@
 import { useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Link,
+  useNavigate,
+} from "react-router-dom";
 import axios from "axios";
 
 import Products from "./pages/Products";
@@ -154,7 +160,9 @@ function Home() {
     <div className="app">
 
       {/* TOP OFFER BAR */}
+
       <div className="offer-bar">
+
         <p>
           🎉 Explore products from our real business database
         </p>
@@ -162,10 +170,12 @@ function Home() {
         <Link to="/products">
           Shop Now →
         </Link>
+
       </div>
 
 
       {/* NAVBAR */}
+
       <header className="navbar">
 
         <Link to="/" className="logo">
@@ -245,6 +255,7 @@ function Home() {
 
 
       {/* HERO */}
+
       <main>
 
         <section className="hero">
@@ -289,6 +300,7 @@ function Home() {
 
 
             {/* REAL DATABASE STATISTICS */}
+
             <div className="hero-stats">
 
               <div>
@@ -363,6 +375,7 @@ function Home() {
 
 
         {/* CATEGORIES */}
+
         <section
           className="section"
           id="categories"
@@ -404,7 +417,11 @@ function Home() {
               <div
                 className="category-card"
                 key={category}
-                onClick={() => navigate("/products")}
+                onClick={() =>
+                  navigate(
+                    `/products?category=${encodeURIComponent(category)}`
+                  )
+                }
                 style={{ cursor: "pointer" }}
               >
 
@@ -440,6 +457,7 @@ function Home() {
 
 
         {/* FEATURED PRODUCTS */}
+
         <section className="section products-section">
 
           <div className="section-header">
@@ -534,6 +552,7 @@ function Home() {
                   <div className="rating">
 
                     📦
+
                     <span>
                       Product ID
                     </span>
@@ -559,6 +578,7 @@ function Home() {
                     className="add-cart"
                     onClick={(event) => {
                       event.stopPropagation();
+
                       navigate(
                         `/products/${product.product_id}`
                       );
@@ -579,6 +599,7 @@ function Home() {
 
 
         {/* DATABASE INFORMATION */}
+
         <section className="offer-section">
 
           <div>
@@ -616,6 +637,7 @@ function Home() {
 
 
       {/* FOOTER */}
+
       <footer className="footer">
 
         <div className="footer-main">
