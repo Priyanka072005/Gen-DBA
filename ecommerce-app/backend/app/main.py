@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routes import products
 from app.routes import orders
 from app.routes import customers
+from app.routes import home
 
 app = FastAPI(
     title="GenShop API",
@@ -35,6 +36,8 @@ app.add_middleware(
 app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(customers.router)
+app.include_router(home.router)
+
 
 # ---------------------------------------------------------
 # ROOT

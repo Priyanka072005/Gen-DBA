@@ -1,116 +1,240 @@
-import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Link, useNavigate } from "react-router-dom";
+import axios from "axios";
+
 import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import Customers from "./pages/Customers";
 import CustomerDetails from "./pages/CustomerDetails";
+
 import "./App.css";
 
-function Home() {
-  const categories = [
-    {
-      icon: "💄",
-      title: "Beauty",
-      text: "Skincare, cosmetics & more",
-    },
-    {
-      icon: "📱",
-      title: "Electronics",
-      text: "Smart gadgets & devices",
-    },
-    {
-      icon: "🏠",
-      title: "Home & Living",
-      text: "Make your home beautiful",
-    },
-    {
-      icon: "👗",
-      title: "Fashion",
-      text: "Latest trends & styles",
-    },
-  ];
 
-  const products = [
-    {
-      image: "🧴",
-      name: "Premium Beauty Collection",
-      category: "Beauty",
-      price: "₹899",
-      oldPrice: "₹1,299",
-      discount: "31% OFF",
-    },
-    {
-      image: "🎧",
-      name: "Wireless Headphones",
-      category: "Electronics",
-      price: "₹1,499",
-      oldPrice: "₹2,199",
-      discount: "32% OFF",
-    },
-    {
-      image: "⌚",
-      name: "Smart Watch",
-      category: "Electronics",
-      price: "₹2,299",
-      oldPrice: "₹3,499",
-      discount: "34% OFF",
-    },
-    {
-      image: "👜",
-      name: "Premium Fashion Bag",
-      category: "Fashion",
-      price: "₹1,199",
-      oldPrice: "₹1,799",
-      discount: "33% OFF",
-    },
-  ];
+function Home() {
+  const navigate = useNavigate();
+
+  const [homeData, setHomeData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchHomeData();
+  }, []);
+
+  const fetchHomeData = async () => {
+    try {
+      const response = await axios.get(
+        "http://127.0.0.1:8001/home/"
+      );
+
+      setHomeData(response.data);
+
+    } catch (error) {
+      console.error("Error fetching home data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+
+  const formatCategory = (category) => {
+    if (!category) {
+      return "General";
+    }
+
+    return category
+      .replace(/_/g, " ")
+      .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  };
+
+
+  const getCategoryIcon = (category) => {
+    const value = (category || "").toLowerCase();
+
+    if (
+      value.includes("beauty") ||
+      value.includes("perfumery")
+    ) {
+      return "💄";
+    }
+
+    if (
+      value.includes("computer") ||
+      value.includes("electronics") ||
+      value.includes("telephony") ||
+      value.includes("audio")
+    ) {
+      return "📱";
+    }
+
+    if (
+      value.includes("fashion") ||
+      value.includes("clothing") ||
+      value.includes("shoes")
+    ) {
+      return "👗";
+    }
+
+    if (
+      value.includes("home") ||
+      value.includes("furniture") ||
+      value.includes("housewares")
+    ) {
+      return "🏠";
+    }
+
+    if (
+      value.includes("sports") ||
+      value.includes("leisure")
+    ) {
+      return "⚽";
+    }
+
+    if (
+      value.includes("books") ||
+      value.includes("music")
+    ) {
+      return "📚";
+    }
+
+    if (
+      value.includes("baby") ||
+      value.includes("toys")
+    ) {
+      return "🧸";
+    }
+
+    if (
+      value.includes("auto")
+    ) {
+      return "🚗";
+    }
+
+    if (
+      value.includes("food") ||
+      value.includes("drinks")
+    ) {
+      return "🍴";
+    }
+
+    return "🛍️";
+  };
+
+
+  const getFeaturedCategories = () => {
+    if (!homeData?.categories) {
+      return [];
+    }
+
+    return homeData.categories.slice(0, 8);
+  };
+
+
+  const getFeaturedProducts = () => {
+    if (!homeData?.featured_products) {
+      return [];
+    }
+
+    return homeData.featured_products;
+  };
+
+
+  if (loading) {
+    return (
+      <div className="product-details-loading">
+        <div className="loader"></div>
+        <p>Loading GenShop...</p>
+      </div>
+    );
+  }
+
 
   return (
     <div className="app">
 
       {/* TOP OFFER BAR */}
       <div className="offer-bar">
-        <p>🎉 Free shipping on orders above ₹999</p>
-        <span>Shop Now →</span>
+        <p>
+          🎉 Explore products from our real business database
+        </p>
+
+        <Link to="/products">
+          Shop Now →
+        </Link>
       </div>
+
 
       {/* NAVBAR */}
       <header className="navbar">
 
         <Link to="/" className="logo">
-          <span className="logo-icon">G</span>
+
+          <span className="logo-icon">
+            G
+          </span>
 
           <span>
             Gen<span>Shop</span>
           </span>
+
         </Link>
 
+
         <nav className="nav-links">
-          <Link to="/">Home</Link>
-          <Link to="/products">Products</Link>
-          <Link to="/customers">Customers</Link>
-          <a href="#categories">Categories</a>
-          <Link to="/orders">Orders</Link>
+
+          <Link to="/">
+            Home
+          </Link>
+
+          <Link to="/products">
+            Products
+          </Link>
+
+          <Link to="/customers">
+            Customers
+          </Link>
+
+          <a href="#categories">
+            Categories
+          </a>
+
+          <Link to="/orders">
+            Orders
+          </Link>
+
         </nav>
+
 
         <div className="nav-actions">
 
-          <button className="icon-button">
+          <button
+            type="button"
+            className="icon-button"
+          >
             🔍
           </button>
 
-          <button className="icon-button">
+          <button
+            type="button"
+            className="icon-button"
+          >
             ♡
           </button>
 
-          <button className="cart-button">
+          <button
+            type="button"
+            className="cart-button"
+          >
             🛒
             <span>Cart</span>
             <b>0</b>
           </button>
 
-          <button className="account-button">
+          <button
+            type="button"
+            className="account-button"
+          >
             👤
             <span>Account</span>
           </button>
@@ -118,6 +242,7 @@ function Home() {
         </div>
 
       </header>
+
 
       {/* HERO */}
       <main>
@@ -127,8 +252,9 @@ function Home() {
           <div className="hero-content">
 
             <span className="hero-badge">
-              ✨ NEW COLLECTION 2026
+              ✨ REAL BUSINESS DATA
             </span>
+
 
             <h1>
               Everything You Need,
@@ -136,14 +262,19 @@ function Home() {
               <span>All in One Place.</span>
             </h1>
 
+
             <p>
-              Discover thousands of products at amazing prices.
-              Shop smarter, faster and easier with GenShop.
+              Explore real products, customers and orders
+              powered by the GenShop business database.
             </p>
+
 
             <div className="hero-buttons">
 
-              <Link to="/products" className="primary-button">
+              <Link
+                to="/products"
+                className="primary-button"
+              >
                 Shop Now →
               </Link>
 
@@ -156,30 +287,57 @@ function Home() {
 
             </div>
 
+
+            {/* REAL DATABASE STATISTICS */}
             <div className="hero-stats">
 
               <div>
-                <strong>32K+</strong>
-                <span>Products</span>
+
+                <strong>
+                  {homeData?.statistics?.products?.toLocaleString() || 0}
+                </strong>
+
+                <span>
+                  Products
+                </span>
+
               </div>
 
-              <div>
-                <strong>10K+</strong>
-                <span>Happy Customers</span>
-              </div>
 
               <div>
-                <strong>4.8★</strong>
-                <span>Customer Rating</span>
+
+                <strong>
+                  {homeData?.statistics?.customers?.toLocaleString() || 0}
+                </strong>
+
+                <span>
+                  Customers
+                </span>
+
+              </div>
+
+
+              <div>
+
+                <strong>
+                  {homeData?.statistics?.orders?.toLocaleString() || 0}
+                </strong>
+
+                <span>
+                  Orders
+                </span>
+
               </div>
 
             </div>
 
           </div>
 
+
           <div className="hero-visual">
 
             <div className="hero-circle"></div>
+
 
             <div className="hero-product-card">
 
@@ -187,12 +345,14 @@ function Home() {
                 🛍️
               </div>
 
+
               <div className="floating-card card-one">
-                ⭐ 4.8 Rating
+                📊 Real Database
               </div>
 
+
               <div className="floating-card card-two">
-                🔥 Best Seller
+                ⚡ Fast API
               </div>
 
             </div>
@@ -200,6 +360,7 @@ function Home() {
           </div>
 
         </section>
+
 
         {/* CATEGORIES */}
         <section
@@ -220,10 +381,11 @@ function Home() {
               </h2>
 
               <p>
-                Find everything you need in one place.
+                Browse categories from the real product dataset.
               </p>
 
             </div>
+
 
             <Link
               to="/products"
@@ -234,30 +396,35 @@ function Home() {
 
           </div>
 
+
           <div className="category-grid">
 
-            {categories.map((category) => (
+            {getFeaturedCategories().map((category) => (
 
               <div
                 className="category-card"
-                key={category.title}
+                key={category}
+                onClick={() => navigate("/products")}
+                style={{ cursor: "pointer" }}
               >
 
                 <div className="category-icon">
-                  {category.icon}
+                  {getCategoryIcon(category)}
                 </div>
+
 
                 <div>
 
                   <h3>
-                    {category.title}
+                    {formatCategory(category)}
                   </h3>
 
                   <p>
-                    {category.text}
+                    Explore products in this category
                   </p>
 
                 </div>
+
 
                 <span className="arrow">
                   →
@@ -271,6 +438,7 @@ function Home() {
 
         </section>
 
+
         {/* FEATURED PRODUCTS */}
         <section className="section products-section">
 
@@ -279,7 +447,7 @@ function Home() {
             <div>
 
               <span className="section-label">
-                TRENDING NOW
+                FROM DATABASE
               </span>
 
               <h2>
@@ -287,10 +455,11 @@ function Home() {
               </h2>
 
               <p>
-                Popular products picked for you.
+                Real products retrieved directly from MySQL.
               </p>
 
             </div>
+
 
             <Link
               to="/products"
@@ -301,60 +470,101 @@ function Home() {
 
           </div>
 
+
           <div className="product-grid">
 
-            {products.map((product) => (
+            {getFeaturedProducts().map((product) => (
 
               <div
                 className="product-card"
-                key={product.name}
+                key={product.product_id}
+                onClick={() =>
+                  navigate(`/products/${product.product_id}`)
+                }
+                style={{ cursor: "pointer" }}
               >
 
                 <div className="product-image">
 
                   <span className="discount">
-                    {product.discount}
+                    REAL DATA
                   </span>
 
-                  <button className="wishlist">
+
+                  <button
+                    type="button"
+                    className="wishlist"
+                    onClick={(event) =>
+                      event.stopPropagation()
+                    }
+                  >
                     ♡
                   </button>
 
+
                   <div className="large-product-icon">
-                    {product.image}
+                    {getCategoryIcon(
+                      product.product_category_name
+                    )}
                   </div>
 
                 </div>
 
+
                 <div className="product-info">
 
                   <span className="product-category">
-                    {product.category}
+
+                    {formatCategory(
+                      product.product_category_name
+                    )}
+
                   </span>
 
+
                   <h3>
-                    {product.name}
+
+                    {formatCategory(
+                      product.product_category_name
+                    )}
+
                   </h3>
 
+
                   <div className="rating">
-                    ⭐⭐⭐⭐⭐
-                    <span>(120)</span>
+
+                    📦
+                    <span>
+                      Product ID
+                    </span>
+
                   </div>
+
 
                   <div className="price-row">
 
                     <strong>
-                      {product.price}
+                      {product.product_weight_g || 0} g
                     </strong>
 
-                    <del>
-                      {product.oldPrice}
-                    </del>
+                    <span>
+                      {product.product_photos_qty || 0} photos
+                    </span>
 
                   </div>
 
-                  <button className="add-cart">
-                    🛒 Add to Cart
+
+                  <button
+                    type="button"
+                    className="add-cart"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      navigate(
+                        `/products/${product.product_id}`
+                      );
+                    }}
+                  >
+                    View Product →
                   </button>
 
                 </div>
@@ -367,39 +577,43 @@ function Home() {
 
         </section>
 
-        {/* OFFER */}
+
+        {/* DATABASE INFORMATION */}
         <section className="offer-section">
 
           <div>
 
             <span className="offer-label">
-              LIMITED TIME OFFER
+              GENDATABASE
             </span>
 
             <h2>
-              Get up to <strong>50% OFF</strong>
+              Powered by <strong>Real Data</strong>
             </h2>
 
             <p>
-              Don't miss out on our biggest deals of the season.
+              GenShop uses real business data stored in
+              MySQL and monitored by Gen-DBA.
             </p>
 
             <Link
               to="/products"
               className="primary-button"
             >
-              Shop Deals →
+              Explore Products →
             </Link>
 
           </div>
 
+
           <div className="offer-icon">
-            🛍️
+            🗄️
           </div>
 
         </section>
 
       </main>
+
 
       {/* FOOTER */}
       <footer className="footer">
@@ -423,12 +637,14 @@ function Home() {
 
             </Link>
 
+
             <p>
-              Your trusted destination for quality
-              products and great deals.
+              A realistic business application powered by
+              React, FastAPI and MySQL.
             </p>
 
           </div>
+
 
           <div className="footer-column">
 
@@ -445,38 +661,32 @@ function Home() {
             </Link>
 
             <Link to="/products">
-              Deals
-            </Link>
-
-            <Link to="/products">
               New Arrivals
             </Link>
 
+            <Link to="/orders">
+              Orders
+            </Link>
+
           </div>
+
 
           <div className="footer-column">
 
             <h4>
-              Support
+              Customers
             </h4>
 
-            <a href="/">
-              Contact Us
-            </a>
+            <Link to="/customers">
+              Customers
+            </Link>
 
-            <a href="/">
-              Help Center
-            </a>
-
-            <a href="/">
-              Shipping
-            </a>
-
-            <a href="/">
-              Returns
-            </a>
+            <Link to="/customers">
+              Customer Details
+            </Link>
 
           </div>
+
 
           <div className="footer-column">
 
@@ -504,6 +714,7 @@ function Home() {
 
         </div>
 
+
         <div className="footer-bottom">
 
           <p>
@@ -522,49 +733,64 @@ function Home() {
   );
 }
 
+
 function App() {
+
   return (
     <BrowserRouter>
 
       <Routes>
 
         {/* HOME */}
+
         <Route
           path="/"
           element={<Home />}
         />
 
+
         {/* PRODUCTS */}
+
         <Route
           path="/products"
           element={<Products />}
         />
 
+
         {/* PRODUCT DETAILS */}
+
         <Route
           path="/products/:productId"
           element={<ProductDetails />}
         />
 
+
         {/* ORDERS */}
+
         <Route
           path="/orders"
           element={<Orders />}
         />
 
+
         {/* ORDER DETAILS */}
+
         <Route
           path="/orders/:orderId"
           element={<OrderDetails />}
         />
 
+
         {/* CUSTOMERS */}
+
         <Route
           path="/customers"
           element={<Customers />}
         />
 
+
         {/* CUSTOMER DETAILS */}
+
         <Route
           path="/customers/:customerId"
           element={<CustomerDetails />}
@@ -575,5 +801,6 @@ function App() {
     </BrowserRouter>
   );
 }
+
 
 export default App;
