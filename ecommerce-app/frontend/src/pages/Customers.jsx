@@ -128,9 +128,15 @@ function Customers() {
                   <tr key={customer.customer_id}>
 
                     <td>
-                      <strong className="order-id">
+                        <button
+                            type="button"
+                            className="order-id-button"
+                            onClick={() =>
+                              navigate(`/customers/${customer.customer_id}`)
+                            }
+                        >
                         {customer.customer_id.slice(0, 12)}...
-                      </strong>
+                        </button>
                     </td>
 
                     <td>

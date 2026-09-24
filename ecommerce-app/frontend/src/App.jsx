@@ -4,6 +4,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Orders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import Customers from "./pages/Customers";
+import CustomerDetails from "./pages/CustomerDetails";
 import "./App.css";
 
 function Home() {
@@ -561,6 +562,12 @@ function App() {
         <Route
           path="/customers"
           element={<Customers />}
+        />
+
+        {/* CUSTOMER DETAILS */}
+        <Route
+          path="/customers/:customerId"
+          element={<CustomerDetails />}
         />
 
       </Routes>
